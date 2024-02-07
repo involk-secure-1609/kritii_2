@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "535252869661",
+    "project_id": "kritiiiii-38026",
+    "storage_bucket": "kritiiiii-38026.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:535252869661:android:a47d6484441ac10c5b5cf4",
+        "android_client_info": {
+          "package_name": "com.example.untitled3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK1dJ-CRuyPc6yovDrIVhJZ_R0PjmZSeA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
