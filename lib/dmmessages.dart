@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -32,8 +34,36 @@ class _DmMessageScreen extends State<DmMessageScreen> {
         .orderBy('timeSent', descending: true)
         .snapshots();
   }
+  // File? imageFile;
+  // Future getImage() async {
+  //   ImagePicker _picker = ImagePicker();
+  //
+  //   await _picker.pickImage(source: ImageSource.gallery).then((xFile) {
+  //     if (xFile != null) {
+  //       imageFile = File(xFile.path);
+  //       uploadImage();
+  //     }
+  //   });
+  // }
+  // Future uploadImage() async {
+  //   String fileName = Uuid().v1();
+  //   int status = 1;
+  //
+  //   await _firestore
+  //       .collection('chatroom')
+  //       .doc(chatRoomId)
+  //       .collection('chats')
+  //       .doc(fileName)
+  //       .set({
+  //     "sendby": _auth.currentUser!.displayName,
+  //     "message": "",
+  //     "type": "img",
+  //     "time": FieldValue.serverTimestamp(),
+  //   });
 
-  DatabaseProvider databaseProvider = DatabaseProvider();
+
+
+    DatabaseProvider databaseProvider = DatabaseProvider();
   TextEditingController textController = TextEditingController();
   ScrollController scrollController = ScrollController();
 
@@ -126,23 +156,6 @@ class _DmMessageScreen extends State<DmMessageScreen> {
             child: Row(
               children: <Widget>[
                 const SizedBox(
-                  width: 15,
-                ),
-                Expanded(
-                  child: Material(
-                    color: Color.fromRGBO(85, 85, 85, 1),
-                    child: TextField(
-                      controller: textController,
-                      autofocus: true,
-                      decoration: const InputDecoration(
-                          hintText: "Write message...",
-                          hintStyle: TextStyle(
-                              color: Color.fromRGBO(170, 170, 170, 1)),
-                          border: InputBorder.none),
-                    ),
-                  ),
-                ),
-                const SizedBox(
                   width: 5,
                 ),
                 GestureDetector(
@@ -151,7 +164,6 @@ class _DmMessageScreen extends State<DmMessageScreen> {
                     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
                     if (pickedFile != null) {
-                      // Handle the picked image, you can send it or perform other actions
                       print("Image path: ${pickedFile.path}");
                     }
                   },
@@ -163,9 +175,33 @@ class _DmMessageScreen extends State<DmMessageScreen> {
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: Icon(
-                      Icons.attachment_sharp,
+                      Icons.photo,
                       color: Colors.white,
                       size: 20,
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Expanded(
+                  child: Material(
+                    color: Color.fromRGBO(85, 85, 85, 1),
+                    borderRadius: BorderRadius.circular(20.0), // Adjust the radius as needed
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20.0), // Same radius as Material's borderRadius
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 2, 0, 2),
+                        child: TextField(
+                          controller: textController,
+                          autofocus: true,
+                          decoration: const InputDecoration(
+                              hintText: "Write message...",
+                              hintStyle: TextStyle(color: Color.fromRGBO(170, 170, 170, 1)),
+                              border: InputBorder.none
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -176,15 +212,23 @@ class _DmMessageScreen extends State<DmMessageScreen> {
                   onTap: () async {
                     String groupId = groupid;
                     bool isGroup = false;
-                    Message message = Message(
-                        message: textController.text,
-                        timeSent: DateTime.timestamp(),
-                        senderId: "user1");
+                    String msg=textController.text;
                     textController.clear();
-                    await databaseProvider.sendMessage(
-                        groupId, isGroup, message);
-                    scrollController.animateTo(
-                      scrollController.position.maxScrollExtent,
+                    Message message = Message(
+                        message: msg,
+                        timeSent: DateTime.timestamp(),
+                        senderId: "user1", type: 'text');
+                    await databaseProvider.sendMessage(groupId, isGroup, message);
+                    await FirebaseFirestore.instance
+                        .collection('DmConversations')
+                        .doc(groupId)
+                        .update({
+                      'lastMessage': msg,
+                      'lastTime':  DateTime.timestamp(),
+                      'lastSender': "user1",
+                    });
+                    await scrollController.animateTo(
+                      scrollController.position.minScrollExtent,
                       curve: Curves.easeOut,
                       duration: const Duration(milliseconds: 100),
                     );

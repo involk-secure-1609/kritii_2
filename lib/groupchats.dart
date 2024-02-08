@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:untitled3/splash.dart';
 import 'groupmessages.dart';
 
@@ -88,6 +89,11 @@ class _GroupChatScreen extends State<GroupChatScreen> {
               String GroupId = document.id;
               Map<String, dynamic> data =
               document.data()! as Map<String, dynamic>;
+              String lastMsg =data['lastMessage'];
+              Timestamp time=data['lastTime'];
+              DateTime dateTime = time.toDate();
+              String formattedDateTime = DateFormat('dd/MM/yyyy').format(dateTime);
+
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -112,19 +118,76 @@ class _GroupChatScreen extends State<GroupChatScreen> {
                   child: Row(
                     children: [
                       const CircleAvatar(
-                        child: Icon(Icons
-                            .group_sharp), // You can use any icon you prefer
+                        child: Icon(
+                            Icons.person), // You can use any icon you prefer
                       ),
                       const SizedBox(width: 10.0),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 2, 0, 0),
-                        child: Text(
-                          data['chatName'],
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 6, 0, 0),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    data['chatName'],
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(width: 120,),
+                                  Text(
+                                    formattedDateTime,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 2,
+                            ),
+                            RichText(
+                              maxLines: 1,
+                              softWrap: false,
+                              overflow: TextOverflow.ellipsis,
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: data['lastSender'],
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: ' : ',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: data['lastMessage'],
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  // Add more TextSpan widgets for additional texts with different styles
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
