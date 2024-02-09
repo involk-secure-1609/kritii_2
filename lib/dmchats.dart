@@ -77,7 +77,7 @@ class _DmChatScreen extends State<DmChatScreen> {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return SplashScreen1();
+            return const Text('Something went wrong');
           }
 
           return ListView(

@@ -1,8 +1,11 @@
+import 'dart:html';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'chat_model.dart';
 import 'message_model.dart';
+import 'comment_model.dart';
 
 class DatabaseProvider {
   final FirebaseFirestore db = FirebaseFirestore.instance;
@@ -22,6 +25,20 @@ class DatabaseProvider {
       debugPrint(message.toString());
       CollectionReference messages = docRef.collection("messages");
       await messages.add(message.toJson());
+    }
+  }
+
+  Future<void> sendComments(String docId, bool isSynergy, Comment comment) async {
+    if (isSynergy) {
+      CollectionReference collectionRef = db.collection("SynergyComments");
+      DocumentReference docRef = collectionRef.doc(docId);
+      CollectionReference comments = docRef.collection("comments");
+      await comments.add(comment.toJson());
+    } else {
+      CollectionReference collectionRef = db.collection("CourseReviewComments");
+      DocumentReference docRef = collectionRef.doc(docId);
+      CollectionReference comments = docRef.collection("comments");
+      await comments.add(comment.toJson());
     }
   }
 

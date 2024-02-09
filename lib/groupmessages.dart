@@ -166,7 +166,7 @@ class _GroupMessageScreen extends State<GroupMessageScreen> {
                     Message message = Message(
                         message: textController.text,
                         timeSent: DateTime.timestamp(),
-                        senderId: "user1", type: '');
+                        senderId: "user1", image: '');
                     textController.clear();
                     await databaseProvider.sendMessage(
                         groupId, isGroup, message);

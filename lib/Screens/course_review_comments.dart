@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:untitled3/Widgets/container1.dart';
-import 'package:untitled3/Widgets/skill_container.dart';
-import 'package:untitled3/Widgets/synergy_container.dart';
 
-import '../splash.dart';
+import '../Widgets/container1.dart';
+import '../Widgets/skill_container.dart';
+import '../database_provider.dart';
 
 class CourseReviewComments extends StatefulWidget {
   final String title;
@@ -45,7 +45,8 @@ class _CourseReviewComments extends State<CourseReviewComments> {
     review_title = widget.title;
     review_user = widget.user;
   }
-
+  DatabaseProvider databaseProvider = DatabaseProvider();
+  TextEditingController textController = TextEditingController();
   ScrollController scrollController = ScrollController();
 
   Widget build(BuildContext context) {
@@ -96,17 +97,6 @@ class _CourseReviewComments extends State<CourseReviewComments> {
                   ],
                 ),
                 SizedBox(height: 10),
-                // CommonContainer(
-                //   children: [
-                //     Text(
-                //       review_message,
-                //       style: TextStyle(
-                //           color: Colors.white,
-                //           fontSize: 20,
-                //           fontWeight: FontWeight.bold),
-                //     ),
-                //   ],
-                // ),
                 Container(
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.white), // White border
@@ -123,13 +113,6 @@ class _CourseReviewComments extends State<CourseReviewComments> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                // const Text(
-                //   "Comments",
-                //   style: TextStyle(
-                //       color: Color.fromRGBO(224, 140, 56, 1),
-                //       fontSize: 24,
-                //       fontWeight: FontWeight.bold),
-                // ),
                 const Icon(
                   Icons.comment_outlined,
                   size: 26,
@@ -192,6 +175,79 @@ class _CourseReviewComments extends State<CourseReviewComments> {
               ],
             ),
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return Dialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  elevation: 0,
+                  backgroundColor: Colors.transparent,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    padding: EdgeInsets.all(20.0),
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(85, 85, 85, 1),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Add Comments',
+                          style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 20),
+                        TextField(
+                          controller: textController,
+                          maxLines: 10,
+                          style: TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: 'Type here...',
+                            hintStyle: TextStyle(color: Colors.white),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 10,),
+                        ElevatedButton(
+                          onPressed: () {
+
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(
+                            'Send Comment',
+                            style: TextStyle(color: Colors.black87),
+                          ),
+                        ),
+                        // ElevatedButton(
+                        //   onPressed: () {
+                        //     Navigator.of(context).pop();
+                        //   },
+                        //   child: Text(
+                        //     'Cancel',
+                        //     style: TextStyle(color: Colors.black87),
+                        //   ),
+                        // ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+          child: Icon(Icons.add),
+          backgroundColor: Colors.orange,
         ),
       ),
     );

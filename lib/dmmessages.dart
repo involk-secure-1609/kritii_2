@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:untitled3/splash.dart';
@@ -26,7 +27,7 @@ class _DmMessageScreen extends State<DmMessageScreen> {
   void initState() {
     super.initState();
     oppUser = widget.user;
-    groupid=widget.groupId;
+    groupid = widget.groupId;
     messageStream = FirebaseFirestore.instance
         .collection('DmConversations')
         .doc(widget.groupId)
@@ -34,38 +35,12 @@ class _DmMessageScreen extends State<DmMessageScreen> {
         .orderBy('timeSent', descending: true)
         .snapshots();
   }
-  // File? imageFile;
-  // Future getImage() async {
-  //   ImagePicker _picker = ImagePicker();
-  //
-  //   await _picker.pickImage(source: ImageSource.gallery).then((xFile) {
-  //     if (xFile != null) {
-  //       imageFile = File(xFile.path);
-  //       uploadImage();
-  //     }
-  //   });
-  // }
-  // Future uploadImage() async {
-  //   String fileName = Uuid().v1();
-  //   int status = 1;
-  //
-  //   await _firestore
-  //       .collection('chatroom')
-  //       .doc(chatRoomId)
-  //       .collection('chats')
-  //       .doc(fileName)
-  //       .set({
-  //     "sendby": _auth.currentUser!.displayName,
-  //     "message": "",
-  //     "type": "img",
-  //     "time": FieldValue.serverTimestamp(),
-  //   });
 
-
-
-    DatabaseProvider databaseProvider = DatabaseProvider();
+  DatabaseProvider databaseProvider = DatabaseProvider();
   TextEditingController textController = TextEditingController();
   ScrollController scrollController = ScrollController();
+
+  String imageUrl = '';
 
   @override
   Widget build(BuildContext context) {
@@ -75,10 +50,10 @@ class _DmMessageScreen extends State<DmMessageScreen> {
         backgroundColor: Color.fromRGBO(85, 85, 85, 1),
         title: Row(
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               child: Icon(Icons.person), // You can use any icon you prefer
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Text(oppUser),
@@ -86,7 +61,7 @@ class _DmMessageScreen extends State<DmMessageScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.more_vert,
               color: Color.fromRGBO(224, 140, 56, 1),
             ),
@@ -106,19 +81,19 @@ class _DmMessageScreen extends State<DmMessageScreen> {
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
-                    return Text('Something went wrong');
+                    return const Text('Something went wrong');
                   }
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    SplashScreen1();
+                    return const Text('Something went wrong');
                   }
                   return ListView(
                     reverse: true,
                     shrinkWrap: true,
                     controller: scrollController, // Add this line
                     children:
-                    snapshot.data!.docs.map((DocumentSnapshot document) {
+                        snapshot.data!.docs.map((DocumentSnapshot document) {
                       Map<String, dynamic> data =
-                      document.data()! as Map<String, dynamic>;
+                          document.data()! as Map<String, dynamic>;
                       bool isCurrentUser = data['senderId'] == "user1";
                       return Container(
                         margin: EdgeInsets.symmetric(vertical: 5.0),
@@ -127,7 +102,7 @@ class _DmMessageScreen extends State<DmMessageScreen> {
                             ? Alignment.centerRight
                             : Alignment.centerLeft,
                         child: Material(
-                          color: Color.fromRGBO(85, 85, 85, 1),
+                          color:isCurrentUser? Color.fromRGBO(85, 85, 85, 1):Colors.blueGrey,
                           borderRadius: BorderRadius.circular(8.0),
                           child: Container(
                             padding: EdgeInsets.all(8.0),
@@ -136,9 +111,20 @@ class _DmMessageScreen extends State<DmMessageScreen> {
                                   ? CrossAxisAlignment.end
                                   : CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                data['image'].isNotEmpty
+                                    ? SizedBox(
+                                  width: double.infinity,
+                                  child: AspectRatio(
+                                    aspectRatio: 1, // Adjust the aspect ratio as needed
+                                    child: Image.network(
+                                      data['image'],
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                )
+                                    : Text(
                                   data['message'],
-                                  style: TextStyle(color: Colors.white),
+                                  style: const TextStyle(color: Colors.white),
                                 ),
                               ],
                             ),
@@ -160,21 +146,56 @@ class _DmMessageScreen extends State<DmMessageScreen> {
                 ),
                 GestureDetector(
                   onTap: () async {
-                    final picker = ImagePicker();
-                    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                    ImagePicker picker = ImagePicker();
+                    XFile? file =
+                        await picker.pickImage(source: ImageSource.gallery);
+                    if (file != Null) {
+                      String? path = file?.path;
+                      Reference referenceRoot = FirebaseStorage.instance.ref();
+                      Reference image_reference = referenceRoot.child('images');
+                      Reference image_to_upload = image_reference.child(path!);
 
-                    if (pickedFile != null) {
-                      print("Image path: ${pickedFile.path}");
+                      try {
+                        await image_to_upload.putFile(File(file!.path));
+                        imageUrl = await image_to_upload.getDownloadURL();
+                        String groupId = groupid;
+                        bool isGroup = false;
+                        String msg = textController.text;
+                        textController.clear();
+                        Message message = Message(
+                            message: msg,
+                            timeSent: DateTime.timestamp(),
+                            senderId: "user1",
+                            image: imageUrl);
+                        imageUrl='';
+                        await databaseProvider.sendMessage(
+                            groupId, isGroup, message);
+                        await FirebaseFirestore.instance
+                            .collection('DmConversations')
+                            .doc(groupId)
+                            .update({
+                          'lastMessage': "Image",
+                          'lastTime': DateTime.timestamp(),
+                          'lastSender': "user1",
+                        });
+                        await scrollController.animateTo(
+                          scrollController.position.minScrollExtent,
+                          curve: Curves.easeOut,
+                          duration: const Duration(milliseconds: 100),
+                        );
+                      } catch (error) {
+                        print("error occured");
+                      }
                     }
                   },
                   child: Container(
                     height: 40,
                     width: 40,
                     decoration: BoxDecoration(
-                      color: Color.fromRGBO(233, 161, 93, 1),
+                      color: const Color.fromRGBO(233, 161, 93, 1),
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.photo,
                       color: Colors.white,
                       size: 20,
@@ -187,9 +208,11 @@ class _DmMessageScreen extends State<DmMessageScreen> {
                 Expanded(
                   child: Material(
                     color: Color.fromRGBO(85, 85, 85, 1),
-                    borderRadius: BorderRadius.circular(20.0), // Adjust the radius as needed
+                    borderRadius: BorderRadius.circular(20.0),
+                    // Adjust the radius as needed
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20.0), // Same radius as Material's borderRadius
+                      borderRadius: BorderRadius.circular(20.0),
+                      // Same radius as Material's borderRadius
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(8, 2, 0, 2),
                         child: TextField(
@@ -197,9 +220,9 @@ class _DmMessageScreen extends State<DmMessageScreen> {
                           autofocus: true,
                           decoration: const InputDecoration(
                               hintText: "Write message...",
-                              hintStyle: TextStyle(color: Color.fromRGBO(170, 170, 170, 1)),
-                              border: InputBorder.none
-                          ),
+                              hintStyle: TextStyle(
+                                  color: Color.fromRGBO(170, 170, 170, 1)),
+                              border: InputBorder.none),
                         ),
                       ),
                     ),
@@ -212,19 +235,21 @@ class _DmMessageScreen extends State<DmMessageScreen> {
                   onTap: () async {
                     String groupId = groupid;
                     bool isGroup = false;
-                    String msg=textController.text;
+                    String msg = textController.text;
                     textController.clear();
                     Message message = Message(
                         message: msg,
                         timeSent: DateTime.timestamp(),
-                        senderId: "user1", type: 'text');
-                    await databaseProvider.sendMessage(groupId, isGroup, message);
+                        senderId: "user1",
+                        image: imageUrl);
+                    await databaseProvider.sendMessage(
+                        groupId, isGroup, message);
                     await FirebaseFirestore.instance
                         .collection('DmConversations')
                         .doc(groupId)
                         .update({
                       'lastMessage': msg,
-                      'lastTime':  DateTime.timestamp(),
+                      'lastTime': DateTime.timestamp(),
                       'lastSender': "user1",
                     });
                     await scrollController.animateTo(
@@ -240,7 +265,7 @@ class _DmMessageScreen extends State<DmMessageScreen> {
                       color: Color.fromRGBO(233, 161, 93, 1),
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.send,
                       color: Colors.white,
                       size: 20,
