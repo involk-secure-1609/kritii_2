@@ -236,26 +236,29 @@ class _DmMessageScreen extends State<DmMessageScreen> {
                     bool isGroup = false;
                     String msg = textController.text;
                     textController.clear();
-                    Message message = Message(
-                        message: msg,
-                        timeSent: DateTime.timestamp(),
-                        senderId: "user1",
-                        image: imageUrl);
-                    await databaseProvider.sendMessage(
-                        groupId, isGroup, message);
-                    await FirebaseFirestore.instance
-                        .collection('DmConversations')
-                        .doc(groupId)
-                        .update({
-                      'lastMessage': msg,
-                      'lastTime': DateTime.timestamp(),
-                      'lastSender': "user1",
-                    });
-                    await scrollController.animateTo(
-                      scrollController.position.minScrollExtent,
-                      curve: Curves.easeOut,
-                      duration: const Duration(milliseconds: 100),
-                    );
+                    if(msg!="")
+                      {
+                        Message message = Message(
+                            message: msg,
+                            timeSent: DateTime.timestamp(),
+                            senderId: "user1",
+                            image: imageUrl);
+                        await databaseProvider.sendMessage(
+                            groupId, isGroup, message);
+                        await FirebaseFirestore.instance
+                            .collection('DmConversations')
+                            .doc(groupId)
+                            .update({
+                          'lastMessage': msg,
+                          'lastTime': DateTime.timestamp(),
+                          'lastSender': "user1",
+                        });
+                        await scrollController.animateTo(
+                          scrollController.position.minScrollExtent,
+                          curve: Curves.easeOut,
+                          duration: const Duration(milliseconds: 100),
+                        );
+                      }
                   },
                   child: Container(
                     height: 40,

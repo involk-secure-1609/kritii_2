@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:untitled3/splash.dart';
+import 'package:untitled3/groupchats.dart';
 import 'dmmessages.dart';
 
 class DmChatScreen extends StatefulWidget {
@@ -49,20 +49,16 @@ class _DmChatScreen extends State<DmChatScreen> {
         actions: [
           IconButton(
             icon: const Icon(
-              Icons.person,
-              color: Color.fromRGBO(224, 140, 56, 1),
-            ),
-            onPressed: () {
-              // Handle the action when the three dots icon is pressed
-              print('Three dots icon pressed');
-            },
-          ),
-          IconButton(
-            icon: const Icon(
               Icons.group,
               color: Color.fromRGBO(224, 140, 56, 1),
             ),
             onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GroupChatScreen()
+                ),
+              );
               // Handle the action when the three dots icon is pressed
               print('Three dots icon pressed');
             },
@@ -102,105 +98,107 @@ class _DmChatScreen extends State<DmChatScreen> {
                   DateFormat('dd/MM/yyyy').format(dateTime);
 
               if (data['user1'] == "user1") {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DmMessageScreen(
-                          groupId: groupId,
-                          user: data['user2'],
-                        ),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    width: screenWidth * 0.8,
-                    height: screenHeight * 0.2,
-                    margin: const EdgeInsets.fromLTRB(20, 20, 20, 5),
-                    padding: const EdgeInsets.fromLTRB(5, 5, 20, 20),
-                    decoration: BoxDecoration(
-                      color: const Color.fromRGBO(85, 85, 85, 1),
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: Row(
-                      children: [
-                        const CircleAvatar(
-                          child: Icon(
-                              Icons.person), // You can use any icon you prefer
-                        ),
-                        const SizedBox(width: 10.0),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(0, 6, 0, 0),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      data['user2'],
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 120,
-                                    ),
-                                    Text(
-                                      formattedDateTime,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 2,
-                              ),
-                              RichText(
-                                maxLines: 1,
-                                softWrap: false,
-                                overflow: TextOverflow.ellipsis,
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: data['lastSender'],
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: ' : ',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: data['lastMessage'],
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    // Add more TextSpan widgets for additional texts with different styles
-                                  ],
-                                ),
-                              ),
-                            ],
+                return Flexible(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DmMessageScreen(
+                            groupId: groupId,
+                            user: data['user2'],
                           ),
                         ),
-                      ],
+                      );
+                    },
+                    child: Container(
+                      width: screenWidth * 0.8,
+                      height: screenHeight * 0.22,
+                      margin: const EdgeInsets.fromLTRB(20, 20, 20, 5),
+                      padding: const EdgeInsets.fromLTRB(5, 5, 20, 20),
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(85, 85, 85, 1),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Row(
+                        children: [
+                          const CircleAvatar(
+                            child: Icon(
+                                Icons.person), // You can use any icon you prefer
+                          ),
+                          const SizedBox(width: 10.0),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(0, 6, 0, 0),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        data['user2'],
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 70,
+                                      ),
+                                      Text(
+                                        formattedDateTime,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 2,
+                                ),
+                                RichText(
+                                  maxLines: 1,
+                                  softWrap: false,
+                                  overflow: TextOverflow.ellipsis,
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: data['lastSender'],
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text: ' : ',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: data['lastMessage'],
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      // Add more TextSpan widgets for additional texts with different styles
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -219,7 +217,7 @@ class _DmChatScreen extends State<DmChatScreen> {
                   },
                   child: Container(
                     width: screenWidth * 0.8,
-                    height: screenHeight * 0.1,
+                    height: screenHeight * 0.22,
                     margin: const EdgeInsets.all(20.0),
                     padding: const EdgeInsets.fromLTRB(5, 5, 10, 10),
                     decoration: BoxDecoration(
@@ -249,8 +247,8 @@ class _DmChatScreen extends State<DmChatScreen> {
                                         color: Colors.white,
                                       ),
                                     ),
-                                    SizedBox(
-                                      width: 120,
+                                    const SizedBox(
+                                      width: 100,
                                     ),
                                     Text(
                                       formattedDateTime,
@@ -274,13 +272,13 @@ class _DmChatScreen extends State<DmChatScreen> {
                                   children: [
                                     TextSpan(
                                       text: data['lastSender'],
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
                                     ),
-                                    TextSpan(
+                                    const TextSpan(
                                       text: ' : ',
                                       style: TextStyle(
                                         fontSize: 16,
@@ -290,7 +288,7 @@ class _DmChatScreen extends State<DmChatScreen> {
                                     ),
                                     TextSpan(
                                       text: data['lastMessage'],
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
