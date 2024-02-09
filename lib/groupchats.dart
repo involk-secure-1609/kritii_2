@@ -49,7 +49,17 @@ class _GroupChatScreen extends State<GroupChatScreen> {
         actions: [
           IconButton(
             icon: const Icon(
-              Icons.more_vert,
+              Icons.person,
+              color: Color.fromRGBO(224, 140, 56, 1),
+            ),
+            onPressed: () {
+              // Handle the action when the three dots icon is pressed
+              print('Three dots icon pressed');
+            },
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.group,
               color: Color.fromRGBO(224, 140, 56, 1),
             ),
             onPressed: () {
@@ -64,24 +74,20 @@ class _GroupChatScreen extends State<GroupChatScreen> {
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             print(snapshot);
-
             return const Text('Something went wrong');
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            print(snapshot);
-            return SplashScreen1();
+            return const Text('Something went wrong');
           }
-          print(snapshot);
-
 
           return ListView(
             children: snapshot.data!.docs.where((DocumentSnapshot document) {
-              Map<String, dynamic> data =
-              document.data()! as Map<String, dynamic>;
+              Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
               var isContain = false;
               String userId = "user1";
-              if (data['members'].includes(userId)) {
+              List<String> members=List<String>.from(data['members']);
+              if (members.contains(userId)) {
                 isContain = true;
               }
               return isContain;
@@ -108,7 +114,7 @@ class _GroupChatScreen extends State<GroupChatScreen> {
                 },
                 child: Container(
                   width: screenWidth*0.8,
-                  height: screenHeight*0.1,
+                  height: screenHeight*0.22,
                   margin: EdgeInsets.fromLTRB(20, 20, 20, 5),
                   padding: EdgeInsets.fromLTRB(5, 5, 20, 20),
                   decoration: BoxDecoration(

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:untitled3/Screens/course_review.dart';
 import 'package:untitled3/Screens/synergy_screen.dart';
+import 'package:untitled3/groupchats.dart';
 import 'dmchats.dart';
 import 'firebase_options.dart';
 

@@ -118,7 +118,7 @@ class _DmChatScreen extends State<DmChatScreen> {
                     width: screenWidth * 0.8,
                     height: screenHeight * 0.2,
                     margin: const EdgeInsets.fromLTRB(20, 20, 20, 5),
-                    padding: const EdgeInsets.fromLTRB(5, 5, 10, 10),
+                    padding: const EdgeInsets.fromLTRB(5, 5, 20, 20),
                     decoration: BoxDecoration(
                       color: const Color.fromRGBO(85, 85, 85, 1),
                       borderRadius: BorderRadius.circular(10.0),

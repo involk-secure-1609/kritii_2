@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:untitled3/comment_model.dart';
 
 import '../Widgets/container1.dart';
 import '../Widgets/skill_container.dart';
@@ -201,7 +202,7 @@ class _CourseReviewComments extends State<CourseReviewComments> {
                           'Add Comments',
                           style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
                         TextField(
                           controller: textController,
                           maxLines: 10,
@@ -219,10 +220,16 @@ class _CourseReviewComments extends State<CourseReviewComments> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 10,),
+                        SizedBox(height: 5,),
                         ElevatedButton(
-                          onPressed: () {
-
+                          onPressed: () async {
+                            String comment =textController.text;
+                            textController.clear();
+                            Comment comment1=Comment(
+                              comment:comment,
+                              senderId:"Kevin Jacob"
+                            );
+                            await databaseProvider.sendComments("PH3LGMJWduVZVo9R3ewQ", false, comment1);
                             Navigator.of(context).pop();
                           },
                           child: Text(
@@ -230,15 +237,6 @@ class _CourseReviewComments extends State<CourseReviewComments> {
                             style: TextStyle(color: Colors.black87),
                           ),
                         ),
-                        // ElevatedButton(
-                        //   onPressed: () {
-                        //     Navigator.of(context).pop();
-                        //   },
-                        //   child: Text(
-                        //     'Cancel',
-                        //     style: TextStyle(color: Colors.black87),
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),
